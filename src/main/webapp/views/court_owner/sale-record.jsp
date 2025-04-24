@@ -3,17 +3,19 @@
 <%@ page import="Util.Util" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.LocalDate" %>
+<%@ page import="java.text.DecimalFormat" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   List<Product> products = (List<Product>) request.getAttribute("products");
   List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleRecords");
+  DecimalFormat formatter = new DecimalFormat("#,###");
 %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <%@include file="../include/head.jsp" %>
-  <title>Trang chủ</title>
+  <title>Quản lý bán hàng</title>
 </head>
 
 <body>
@@ -30,11 +32,11 @@
 
   <!-- ======= Title ======= -->
   <div class="pagetitle">
-    <h1>Dashboard</h1>
+    <h1>Quản lý bán hàng</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="<%=request.getContextPath()%>/">Home</a></li>
-        <li class="breadcrumb-item active">Trang chủ</li>
+        <li class="breadcrumb-item active">Quản lý bán hàng</li>
       </ol>
     </nav>
   </div>
@@ -52,8 +54,11 @@
               <div class="mb-3">
                 <label class="form-label">Sản phẩm</label>
                 <select class="form-control" name="product_id" required>
-                  <% for (Product p : products) { %>
-                  <option value="<%= p.getId() %>"><%= p.getName() %> - <%= p.getPrice() %> đ</option>
+                  <% if (products != null && !products.isEmpty()) {
+                    for (Product p : products) { %>
+                  <option value="<%= p.getId() %>"><%= p.getName() %> - <%= formatter.format(p.getPrice()) %> đ</option>
+                  <% } } else { %>
+                  <option value="" disabled>Không có sản phẩm</option>
                   <% } %>
                 </select>
               </div>
@@ -84,13 +89,14 @@
               </tr>
               </thead>
               <tbody>
-              <% for (SaleRecord sr : saleRecords) { %>
+              <% if (saleRecords != null && !saleRecords.isEmpty()) {
+                for (SaleRecord sr : saleRecords) { %>
               <tr>
                 <td><%= sr.getId() %></td>
                 <td><%= sr.getProduct().getName() %></td>
                 <td><%= sr.getQuantity() %></td>
-                <td><%= sr.getPrice() %> đ</td>
-                <td><%= sr.getTotal() %> đ</td>
+                <td><%= formatter.format(sr.getPrice()) %> đ</td>
+                <td><%= formatter.format(sr.getTotal()) %> đ</td>
                 <td>
                   <a href="<%=request.getContextPath()%>/court-owner/sale-record/delete?sale_record_id=<%=sr.getId()%>">
                     <button class="btn btn-warning">
@@ -98,6 +104,10 @@
                     </button>
                   </a>
                 </td>
+              </tr>
+              <% } } else { %>
+              <tr>
+                <td colspan="6" class="text-center">Không có bản ghi bán hàng</td>
               </tr>
               <% } %>
               </tbody>

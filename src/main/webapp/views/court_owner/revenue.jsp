@@ -1,8 +1,10 @@
 <%@ page import="Model.SaleRecord" %>
+<%@ page import="java.text.DecimalFormat" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-List<Booking> bookings = (List<Booking>) request.getAttribute("bookings");
-List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleRecords");
+    List<Booking> bookings = (List<Booking>) request.getAttribute("bookings");
+    List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleRecords");
+    DecimalFormat formatter = new DecimalFormat("#,###");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -57,7 +59,7 @@ List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleReco
                         <div class="card-body">
                             <h5 class="card-title">Tổng doanh thu từ đặt sân</h5>
                             <p class="card-text fs-4 fw-bold">
-                                <%= bookings.stream().mapToDouble(b -> b.getAmount()).sum() %> VND
+                                <%= formatter.format(bookings != null ? bookings.stream().mapToDouble(b -> b.getAmount()).sum() : 0) %> VND
                             </p>
                         </div>
                     </div>
@@ -67,7 +69,7 @@ List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleReco
                         <div class="card-body">
                             <h5 class="card-title">Tổng doanh thu từ bán hàng</h5>
                             <p class="card-text fs-4 fw-bold">
-                                <%= saleRecords.stream().mapToDouble(r -> r.getTotal()).sum() %> VND
+                                <%= formatter.format(saleRecords != null ? saleRecords.stream().mapToDouble(r -> r.getTotal()).sum() : 0) %> VND
                             </p>
                         </div>
                     </div>
@@ -90,14 +92,14 @@ List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleReco
                     </tr>
                     </thead>
                     <tbody>
-                    <% for (Booking b : bookings) { %>
+                    <% if (bookings != null) { for (Booking b : bookings) { %>
                     <tr>
                         <td><%= b.getCourt().getName() %></td>
                         <td><%= b.getStartTime() %></td>
                         <td><%= b.getEndTime() %></td>
-                        <td><%= b.getAmount() %> VND</td>
+                        <td><%= formatter.format(b.getAmount()) %> VND</td>
                     </tr>
-                    <% } %>
+                    <% } } %>
                     </tbody>
                 </table>
             </div>
@@ -115,15 +117,15 @@ List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleReco
                     </tr>
                     </thead>
                     <tbody>
-                    <% for (SaleRecord s : saleRecords) { %>
+                    <% if (saleRecords != null) { for (SaleRecord s : saleRecords) { %>
                     <tr>
                         <td><%= s.getProduct().getName() %></td>
                         <td><%= s.getQuantity() %></td>
-                        <td><%= s.getPrice() %> VND</td>
-                        <td><%= s.getTotal() %> VND</td>
+                        <td><%= formatter.format(s.getPrice()) %> VND</td>
+                        <td><%= formatter.format(s.getTotal()) %> VND</td>
                         <td><%= s.getCreatedAt() %></td>
                     </tr>
-                    <% } %>
+                    <% } } %>
                     </tbody>
                 </table>
             </div>
@@ -171,7 +173,6 @@ List<SaleRecord> saleRecords = (List<SaleRecord>) request.getAttribute("saleReco
     // Default view: show booking, hide sales
     showBooking();
 </script>
-
 
 </body>
 

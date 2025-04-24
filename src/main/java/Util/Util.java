@@ -18,6 +18,7 @@ public class Util {
     public static String usernameRegex = "^[a-zA-Z]+$";
     public static String emailRegex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$";
     public static String phoneRegex = "^0(3|5|7|8|9)[0-9]{8}$";
+    public static String nameRegex = "^[\\p{L}0-9\\s_-]{2,100}$";
 
 
     public static class LocalTimeAdapter implements JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
@@ -53,6 +54,9 @@ public class Util {
     public static String formatLocalDateTime(LocalDateTime dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return dateTime.format(formatter);
+    }
+    public static boolean isNameValid(String name) {
+        return name.matches(nameRegex);
     }
     public static String removeAccents(String input) {
         if (input == null) return null;

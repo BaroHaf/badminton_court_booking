@@ -452,6 +452,7 @@ public class UserController {
                 user.setAvatar(filename);
                 new UserDao().update(user);
                 req.getSession().setAttribute("user", user);
+                req.getSession().setAttribute("success", "Thay đổi ảnh thành công.");
             } catch (ServletException e){
                 e.printStackTrace();
                 req.getSession().setAttribute("warning", "File tải lên phải là 1 ảnh");

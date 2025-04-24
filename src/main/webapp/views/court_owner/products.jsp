@@ -1,7 +1,11 @@
 <%@ page import="java.util.List" %>
 <%@ page import="Model.Product" %>
+<%@ page import="java.text.DecimalFormat" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% List<Product> products = (List<Product>) request.getAttribute("products"); %>
+<%
+    List<Product> products = (List<Product>) request.getAttribute("products");
+    DecimalFormat formatter = new DecimalFormat("#,###");
+%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -58,11 +62,11 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <% for (Product p : products) { %>
+                            <% if (products != null) { for (Product p : products) { %>
                             <tr>
                                 <td><%= p.getId() %></td>
                                 <td><%= p.getName() %></td>
-                                <td><%= p.getPrice() %></td>
+                                <td><%= formatter.format(p.getPrice()) %> VND</td>
                                 <td>
                                     <button onclick="changeUpdateModalForm(<%= p.getId() %>, '<%= p.getName() %>', <%= p.getPrice() %>)"
                                             class="btn btn-primary"
@@ -77,7 +81,7 @@
                                     </a>
                                 </td>
                             </tr>
-                            <% } %>
+                            <% } } %>
                             </tbody>
                         </table>
                     </div>
@@ -126,7 +130,7 @@
     function changeUpdateModalForm(id, name, price) {
         $("#updateId").val(id);
         $("#updateName").val(name);
-        $("#updatePrice").val(price);
+        $("#updatePrice").val(price.toFixed(2));
     }
 </script>
 

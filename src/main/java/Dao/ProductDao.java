@@ -1,6 +1,7 @@
 package Dao;
 
 import Model.Product;
+import Model.User;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
@@ -19,5 +20,10 @@ public class ProductDao extends GenericDao<Product> {
         query.setParameter("id", id);
         query.setParameter("userId", userId);
         return query.getSingleResult();
+    }
+    public Product findByName(String name) {
+        TypedQuery<Product> query = entityManager.createQuery("SELECT p FROM Product p WHERE p.name = :username", Product.class);
+        query.setParameter("username", name);
+        return query.getResultStream().findFirst().orElse(null);
     }
 }
