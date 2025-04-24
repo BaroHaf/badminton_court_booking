@@ -1,0 +1,13 @@
+package Util;
+
+public class Config {
+    public static final String app_name = "ABCD";
+        public static final String app_url = "http://localhost:8080";
+        public static final String email_address = "";
+        public static final String email_password = "";
+
+        public static String vnp_ReturnUrl = app_url + "/badminton_court_management_war_exploded/vnpay-result"; // tự thay đổi dựa trên context path
+        public static String vnp_TmnCode = "";
+        public static String secretKey = "";
+        public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+}
