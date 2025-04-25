@@ -413,6 +413,8 @@ public class UserController {
 
     @WebServlet("/admin/create-user")
     public static class AdminCreatUser extends HttpServlet {
+        private final UserDao userDao = new UserDao();
+
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             String username = req.getParameter("username");
@@ -422,22 +424,77 @@ public class UserController {
             boolean verified = Boolean.parseBoolean(req.getParameter("verified"));
             boolean blocked = Boolean.parseBoolean(req.getParameter("blocked"));
             Rank rank = Rank.BRONZE;
-            Role role = Role.valueOf(req.getParameter("role"));
-            if (new UserDao().findByEmail(email) != null) {
+            Role role;
+
+            // Kiểm tra đầu vào
+            if (username == null || username.trim().isEmpty() ||
+                    email == null || email.trim().isEmpty() ||
+                    phone == null || phone.trim().isEmpty() ||
+                    password == null || password.trim().isEmpty()) {
+                req.getSession().setAttribute("warning", "Vui lòng điền đầy đủ thông tin.");
+                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
+            }
+
+            // Kiểm tra tính hợp lệ của dữ liệu
+            if (!Util.isUsernameValid(username)) {
+                req.getSession().setAttribute("warning", "Username không hợp lệ. Chỉ chấp nhận chữ cái (a-z, A-Z).");
+                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
+            }
+
+            if (!Util.isEmailValid(email)) {
+                req.getSession().setAttribute("warning", "Email không hợp lệ. Vui lòng nhập email đúng định dạng.");
+                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
+            }
+
+            if (!Util.isPhoneValid(phone)) {
+                req.getSession().setAttribute("warning", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 03, 05, 07, 08, hoặc 09 và có 10 chữ số.");
+                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
+            }
+
+            if (!Util.isPasswordValid(password)) {
+                req.getSession().setAttribute("warning", "Mật khẩu không hợp lệ. Phải có ít nhất 8 ký tự và chứa ít nhất một ký tự đặc biệt.");
+                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
+            }
+
+            // Kiểm tra vai trò (role)
+            try {
+                role = Role.valueOf(req.getParameter("role"));
+            } catch (IllegalArgumentException e) {
+                req.getSession().setAttribute("warning", "Vai trò không hợp lệ.");
+                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
+            }
+
+            // Kiểm tra trùng lặp
+            if (userDao.findByEmail(email) != null) {
                 req.getSession().setAttribute("warning", "Email đang được sử dụng.");
                 resp.sendRedirect(req.getContextPath() + "/admin/users");
-            } else if (new UserDao().findByPhone(phone) != null) {
+                return;
+            }
+
+            if (userDao.findByPhone(phone) != null) {
                 req.getSession().setAttribute("warning", "Số điện thoại đang được sử dụng.");
                 resp.sendRedirect(req.getContextPath() + "/admin/users");
-            } else if (new UserDao().findByUsername(username) != null) {
+                return;
+            }
+
+            if (userDao.findByUsername(username) != null) {
                 req.getSession().setAttribute("warning", "Username đang được sử dụng.");
                 resp.sendRedirect(req.getContextPath() + "/admin/users");
-            } else {
-                User user = new User(email, username, password, "uploads/default-avatar.png", phone, verified, blocked, role, rank);
-                new UserDao().save(user);
-                req.getSession().setAttribute("success", "Tạo tài khoản thành công.");
-                resp.sendRedirect(req.getContextPath() + "/admin/users");
+                return;
             }
+
+            // Tạo và lưu người dùng
+            User user = new User(email, username, BCrypt.hashpw(password, BCrypt.gensalt()),
+                    "Uploads/default-avatar.png", phone, verified, blocked, role, rank);
+            userDao.save(user);
+            req.getSession().setAttribute("success", "Tạo tài khoản thành công.");
+            resp.sendRedirect(req.getContextPath() + "/admin/users");
         }
     }
 

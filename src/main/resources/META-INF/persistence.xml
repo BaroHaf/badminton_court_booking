@@ -6,7 +6,7 @@
     <persistence-unit name="badminton_court">
         <class>Model.User</class>
         <properties>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://192.168.102.2:1433;database=tttest;encrypt=false" />
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://192.168.17.172:1433;database=tttest;encrypt=false" />
             <property name="jakarta.persistence.jdbc.user" value="sa" />
             <property name="jakarta.persistence.jdbc.password" value="12345678" />
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />

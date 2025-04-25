@@ -3,6 +3,8 @@ package Dao;
 import Model.User;
 import jakarta.persistence.TypedQuery;
 
+import java.util.List;
+
 public class UserDao extends GenericDao<User>{
     public UserDao() {
         super();
@@ -29,4 +31,10 @@ public class UserDao extends GenericDao<User>{
         query.setParameter("token", token);
         return query.getResultStream().findFirst().orElse(null);
     }
+    public List<User> findCourtOwners() {
+        TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.role = :role", User.class);
+        query.setParameter("role", "COURT_OWNER");
+        return query.getResultList();
+    }
+
 }

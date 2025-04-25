@@ -6,6 +6,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     List<Venue> venues = new VenueDao().getAll();
+    User currentUser = (User) session.getAttribute("user");
+    boolean isCourtOwner = currentUser != null && currentUser.getRole() == Role.COURT_OWNER;
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +25,6 @@
 
     <!-- ======= Role Checking ======= -->
     <%
-        User currentUser = (User) session.getAttribute("user");
         boolean isAdminOrOwner = false;
         boolean showHomeSection = true;
 
@@ -72,16 +73,19 @@
                 Danh Sách Cơ Sở Cầu Lông
             </h2>
 
-            <% for (int i = 0; i < venues.size(); i++) { %>
-            <% if (!venues.get(i).isDeleted()) { %>
+            <%
+                for (int i = 0; i < venues.size(); i++) {
+                    // Nếu người dùng là Court Owner, chỉ hiển thị sân của họ
+                    if ((isCourtOwner && venues.get(i).getOwner().getId() == currentUser.getId()) || !isCourtOwner) {
+                        if (!venues.get(i).isDeleted()) {
+            %>
             <div class="col-4" style="padding: 15px;">
                 <div class="card h-100" style="border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: 0.3s;">
                     <img
                             src="<%= venues.get(i).getImage() %>"
                             class="card-img-top"
                             alt="Hình ảnh sân"
-                            style="width: 100%; height: 200px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px;"
-                    />
+                            style="width: 100%; height: 200px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px;"/>
                     <div class="card-body">
                         <h5 class="card-title" style="font-weight: bold;"><%= venues.get(i).getName() %></h5>
                         <p class="card-text"><strong>Địa chỉ:</strong> <%= venues.get(i).getAddress() %></p>
@@ -90,15 +94,17 @@
                         <a
                                 href="<%=request.getContextPath()%>/venue-detail?id=<%= venues.get(i).getId() %>&from=&to="
                                 class="btn btn-primary"
-                                style="width: 100%; border-radius: 10px;"
-                        >
+                                style="width: 100%; border-radius: 10px;">
                             Xem chi tiết
                         </a>
                     </div>
                 </div>
             </div>
-            <% } %>
-            <% } %>
+            <%
+                        }
+                    }
+                }
+            %>
         </div>
     </section>
 

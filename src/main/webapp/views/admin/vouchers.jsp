@@ -1,6 +1,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="Model.Voucher" %>
 <%@ page import="Dao.VoucherDao" %>
+<%@ page import="Model.Constant.VoucherType" %> <!-- Đảm bảo đúng đường dẫn -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,7 +51,7 @@
                     </div>
                     <div class="mb-3">
                         <label>Áp dụng cho hạng</label>
-                        <select name="forRank" id="forRank">
+                        <select name="forRank" id="forRank" class="form-control">
                             <option value="BRONZE">BRONZE</option>
                             <option value="SILVER">SILVER</option>
                             <option value="GOLD">GOLD</option>
@@ -77,13 +78,22 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <% List<Voucher> vouchers = new VoucherDao().getAll();
-                        for (Voucher v : vouchers) { %>
+                    <%
+                        List<Voucher> vouchers = new VoucherDao().getAll();
+                        java.text.NumberFormat currencyFormat = java.text.NumberFormat.getInstance(new java.util.Locale("vi", "VN"));
+                        for (Voucher v : vouchers) {
+                    %>
                     <tr>
                         <td><%= v.getId() %></td>
                         <td><%= v.getCode() %></td>
                         <td><%= v.getType() %></td>
-                        <td><%= v.getDiscount() %></td>
+                        <td>
+                            <% if (v.getType() == VoucherType.PERCENTAGE) { %>
+                            <%= v.getDiscount() + "%" %>
+                            <% } else if (v.getType() == VoucherType.FIX_AMOUNT) { %>
+                            <%= currencyFormat.format(v.getDiscount()) + "₫" %>
+                            <% } %>
+                        </td>
                         <td><%= v.getStartDate() %></td>
                         <td><%= v.getEndDate() %></td>
                         <td><%= v.isDisabled() ? "Có" : "Không" %></td>
